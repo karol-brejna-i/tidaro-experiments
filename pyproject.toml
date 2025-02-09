@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tidarator"
+version = "0.1.0"
+description = "A Python CLI app for managing Tidaro.com parking spot bookings."
+authors = [{ name = "Gallus Anonymus", email = "Gallus.Anonymus@example.com" }]
+dependencies = ["click", "python-dotenv", "requests", "yagmail"]
+requires-python = ">=3.12"
+
+[project.scripts]
+tidarator = "tictl:cli"
+
+[tool.hatch.metadata]
+license = "Apache-2.0"
+readme = "README.md"
+
+[tool.hatch.build.targets.wheel]
+include = ["tidarator/**", "tictl.py"]
+exclude = ["**/__pycache__/**", "config.toml", "**/session_secrets", "**/*.log"]
+
+
+[tool.hatch.envs.default]
+python = "3.12"

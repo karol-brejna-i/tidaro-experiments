@@ -1,0 +1,23 @@
+[formatters.brief]
+format = '%(levelname)s:%(name)s:%(message)s'
+
+[formatters.detailed]
+format = '%(asctime)s - %(name)s - %(levelname)s - %(module)s.%(funcName)s:%(lineno)d - %(message)s'
+
+[handlers.console]
+class = "logging.StreamHandler"
+formatter = "brief"
+stream = "ext://sys.stdout"
+level = "DEBUG"
+
+[handlers.file]
+class = "logging.FileHandler"
+formatter = "detailed"
+filename = "/app/logs/application.log"
+mode = "a"
+encoding='utf-8'
+level = "DEBUG"
+
+[root]
+level = "INFO"
+handlers = ["console", "file"]
