@@ -44,7 +44,7 @@ class BookFreeSpots(ParkanizerActionBase):
         gb_result = action.do()
         bookings = gb_result['result']['bookings']
 
-        # filter out weekends and my current bookings
+        # filter out weekends, my current bookings and dates with no free spots
         look_from = datetime.today() + timedelta(days=self.payload["look-ahead"])
         bookings = [
             booking for booking in bookings
@@ -62,7 +62,6 @@ class BookFreeSpots(ParkanizerActionBase):
         from tidarator.spots.book_spot import BookSpot
         book_action = BookSpot(self.session, payload)
 
-        # look_from
         result: dict[str, dict | list] = {'action': 'book_free', 'request': {**self.payload, 'look-from': look_from}}
         attempts = []
         for booking in bookings:

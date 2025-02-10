@@ -1,7 +1,0 @@
-1 0 * * * /usr/bin/docker run \
-    --env-file /home/karol/playground/tidaro/tidaro-experiments/docs/dockerization/example/.env \
-    -v /home/karol/playground/tidaro/tidaro-experiments/docs/dockerization/example/secret:/app/secret \
-    -v /home/karol/playground/tidaro/tidaro-experiments/docs/dockerization/example/config:/app/config \
-    -v /home/karol/playground/tidaro/tidaro-experiments/docs/dockerization/example/logs:/app/logs \
-    -e LOGGING_CONFIG_PATH=/app/config/logging.toml \
-    tidarator show-bookings

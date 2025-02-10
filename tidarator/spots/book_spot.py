@@ -1,6 +1,7 @@
 from .spot_manager import SpotCacheManager
 from .zone_manager import ZoneCacheManager
 from ..actions.action_base import ParkanizerActionBase
+from ..api.utils import str_to_date
 from ..log_config import get_logger
 
 logger = get_logger(__name__)
@@ -29,8 +30,26 @@ class BookSpot(ParkanizerActionBase):
                 {'fromBookingTime': 'P0DT00H00M', 'toBookingTime': 'P1DT00H00M'}
         }
 
-    def do_for_payload(self, p: dict[str, str | list[str]]) -> dict:
+    def _expand_spot_selection(self, zone_id, preference_input, spots_state):
+        """
+        Translate spot names to IDs ('choose any' -> None).
+        Take only free spots.
+        """
 
+        available_items = list([spot['name'] for spot in spots_state if spot['free']])
+        result = []
+
+        for preference in preference_input:
+            if preference == '*':
+                result.append(None)
+                break
+            elif preference in available_items:
+                spot = self.spot_manager.get_by_name(zone_id, preference)
+                result.append(spot.get("id"))
+
+        return result if result else None
+
+    def do_for_payload(self, p: dict[str, str | list[str]]) -> dict:
         logger.info(f'Booking a spot for the payload: {p}')
 
         # get objects' IDs
@@ -41,8 +60,8 @@ class BookSpot(ParkanizerActionBase):
         if type(spots) is str:
             spots = [spots]
 
-        spot_objects = list([self.spot_manager.get_by_name(zone_id, n) for n in spots])
-        spot_ids = list(spot.get('id') if spot else None for spot in spot_objects)
+        spots_states = self.spot_manager.get_spots_state(zone_id, str_to_date(p['for_date']))
+        spot_ids = self._expand_spot_selection(zone_id, spots, spots_states)
 
         logger.debug(f'Zone ID: {zone_id}; Spot IDs: {spot_ids}')
 

@@ -91,6 +91,9 @@ class ParkanizerSpotSession(ParkanizerSessionBase):
             "parkingSpotIdOrNull": spot_id,
             "bookingTimeInterval": {"fromBookingTime": "P0DT00H00M", "toBookingTime": "P1DT00H00M"}
         }
+        # if no spot_id is provided, parkanizer will try to book any spot available (the payload then does not include parkingSpotIdOrNull field
+        if not spot_id:
+            del payload['parkingSpotIdOrNull']
         return self._post(self.TAKE_SPOT_URL, payload)
 
     def release_spot(self, day: datetime | str):
