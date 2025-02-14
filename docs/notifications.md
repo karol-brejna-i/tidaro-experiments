@@ -23,14 +23,17 @@ password.)
 
 The following settings are essential for configuring Gmail notificiations:
 
-| key         | description                                  | notes |
-|-------------|----------------------------------------------|-------|
-| `user`      | Gmail address used to send the messages      |       |
-| `password`  | App password generated for the Gmail account |       |
-| `recipient` | Email address to receive the notifications   |       |
+| key         | description                                    |
+|-------------|------------------------------------------------|
+| `user`      | Gmail address used to send the messages        |
+| `password`  | App password generated for the Gmail account   |
+| `recipient` | Email address(es) to receive the notifications |
 
 The corresponding environment variables are:
 
 - NOTIFIERS_GMAIL_USER
 - NOTIFIERS_GMAIL_PASSWORD
-- NOTIFIERS_GMAIL_RECIPIENT 
+- NOTIFIERS_GMAIL_RECIPIENT
+
+`recipient` can be a comma separated list of e-mail addresses. 
+Example `recipeint` values are 'user1@gmail.com' or 'user1@gmail.com,user2@outlook.com'.

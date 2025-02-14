@@ -85,7 +85,7 @@ configuring notifications. Currently only Gmail notifier is implemented.
 |-----------------------------|---------------------------------------------|
 | `NOTIFIERS_GMAIL_USER`      | Email address to send notifications from.   |
 | `NOTIFIERS_GMAIL_PASSWORD`  | App password for the sending email address. |
-| `NOTIFIERS_GMAIL_RECIPIENT` | Email address to receive notifications.     |
+| `NOTIFIERS_GMAIL_RECIPIENT` | Email address(es) to receive notifications. |
 
 For detailed instructions on setting up Gmail notifications, see
 the [notifications documentation](docs/notifications.md).

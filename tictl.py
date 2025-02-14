@@ -35,11 +35,15 @@ def print_result(data):
 
 
 def configure_notifiers_for_action(action, config):
-    if "notifiers" in config and "gmail" in config["notifiers"]:
+    gmail_config = config.get("notifiers", {}).get("gmail")
+    if gmail_config:
+        recipients = gmail_config["recipient"].split(',')
+        if len(recipients) == 1:
+            recipients = recipients[0] # keep it consistent with previous implementation
         gn = GmailNotifier(
-            config["notifiers"]["gmail"]["user"],
-            config["notifiers"]["gmail"]["password"],
-            config["notifiers"]["gmail"]["recipient"]
+            gmail_config["user"],
+            gmail_config["password"],
+            recipients
         )
         action.register_listener(gn.send_notification)
 

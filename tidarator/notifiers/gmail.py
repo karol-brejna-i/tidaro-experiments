@@ -16,6 +16,8 @@ class GmailNotifier(object):
         self.sender = sender
         self.password = password
         self.recipient = recipient
+        if isinstance(self.recipient, str):
+            self.recipient = [self.recipient]
         self.yag = yagmail.SMTP(sender, password)
         logger.info('gmail notifier initialized')
 
@@ -33,5 +35,8 @@ class GmailNotifier(object):
         body = self._construct_message_body(event_type, data)
         body += '\n\n https://share.parkanizer.com/reservations-list'
 
-        result = self.yag.send(to=self.recipient, subject=subject, contents=body)
-        logger.debug(f'gmail notification sending status:{str(result)}')
+        # if recipient is a string, make it a list
+        for r in self.recipient:
+            result = self.yag.send(to=r, subject=subject, contents=body)
+            logger.debug(f'gmail notification sending to {r} status:{str(result)}')
+
