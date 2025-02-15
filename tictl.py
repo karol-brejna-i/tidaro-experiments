@@ -69,17 +69,26 @@ def cli(ctx):
     type=click.DateTime(formats=["%Y-%m-%d"]),
     help='Date of the reservation in YYYY-MM-DD format.'
 )
+@click.option(
+    '-s', '--spots',
+    default=None,
+    show_default=True,
+    help='Name of the spots to book.'
+)
 @click.pass_context
-def book_spot(ctx, date):
+def book_spot(ctx, date, spots):
     """Book a parking spot."""
     logging.info('run_book_spot')
     config = ctx.obj['config']
+    if spots is None:
+        spots = config["book-spot"]["spots"]
+
     session = get_logged_session(config)
 
     payload = {
         'for_date': utils.date_to_str(date),
         'zone_name': config["book-spot"]["zone"],
-        'spot_name': config["book-spot"]["spots"]
+        'spot_name': spots
     }
     from tidarator.spots.book_spot import BookSpot
     action = BookSpot(session, payload)
