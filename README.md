@@ -36,13 +36,77 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  book-free      Automatically book free spots within your configured...
+  book-free      Automatically book free spots within your configured
+                 parameters.
   book-spot      Book a parking spot for a specific date.
   release-spot   Release a previously reserved parking spot.
   show-bookings  Show all current bookings for your account.
   show-spots     Show spots status for a specific date.
+```
+
+### Book spot
+
+`book-spot` command has the following syntax:
+
+```bash 
+$ tidarator book-spot --help
+Usage: tidarator book-spot [OPTIONS]
+
+  Book a parking spot for a specific date.
+
+Options:
+  -d, --date [%Y-%m-%d]  Date of the reservation in YYYY-MM-DD format.
+                         [default: 2025-02-15]
+  -s, --spot TEXT        Name of the spot (may be many values) to book (or "*"
+                         for "book any").
+  --help                 Show this message and exit.
+```
+
+Example invocations:
+
+- `tidarator book-spot --spot 25` -- book spot '25' for today
+- `tidarator book-spot --spot 25 --spot 11` -- try to book spot '25', then try '11', quit if they are not free
+- `tidarator book-spot --spot '*'` -- book any available spot for today
+- `tidarator book-spot -s 02 -s 03 -s '*'` -- try '02', '03' then try booking any available spot if they are not free
+- `tidarator book-spot --date 2025-05-01 --spot 11` -- book '11' for the first of May
+
+### Release spot
+
+`release-spot` usage:
+```
+Usage: tidarator release-spot [OPTIONS]
+
+  Release a previously reserved parking spot.
+
+Options:
+  -d, --date [%Y-%m-%d]  Date of the reservation in YYYY-MM-DD format.
+                         [default: 2025-02-15]
+  --help                 Show this message and exit.
+```
+
+Example invocations:
+
+- `tidarator release-spot` -- release a spot booked for today
+- `tidarator release-spot --date 2025-05-01` -- release a spot booked for 2025-05-01.
+
+### Show spots
+
+`show-spots` command is used for showing parking spots state for a given day:
 
 ```
+Usage: tidarator show-spots [OPTIONS]
+
+  Show spots status for a specific date.
+
+Options:
+  -d, --date [%Y-%m-%d]  Date of interest in YYYY-MM-DD format.  [default:
+                         2025-02-15]
+  --help                 Show this message and exit.
+```
+
+Example usage:
+- `tidarator show-spots ` -- show spots state for today
+- `tidarator show-spots --date 2025-05-01` -- show spots for 2025-05-01
 
 ## Configuration
 
@@ -58,7 +122,7 @@ The basic configuration settings that allow
 for connecting to the Tidaro service and make bookings according to user's preferences.
 
 | env               | description                                                    |
-|-------------------|----------------------------------------------------------------|
+| ----------------- | -------------------------------------------------------------- |
 | `TIDARO_USER`     | Email of tidaro.com user's account.                            |
 | `TIDARO_PASSWORD` | Password for tidaro.com account.                               |
 | `SPOT_ZONE`       | The name of the parking spot area in the Tidaro service.       |
@@ -75,14 +139,14 @@ try the first spot, if it's not available, try the next one, etc.
 Here are some example values with explanation:
 
 - '*' -- book any free spot
-- '07,08' -- try 07, then 08 and give up when they are not free
-- '07,08,*' -- try 07, then 08 or book any if those are not available
+- '25,08' -- try 25, then 08 and give up when they are not free
+- '25,08,*' -- try 25, then 08 or book any if those are not available
 
 Environment variables that names start with `NOTIFIERS_` are responsible for
 configuring notifications. Currently only Gmail notifier is implemented.
 
 | env                         | description                                 |
-|-----------------------------|---------------------------------------------|
+| --------------------------- | ------------------------------------------- |
 | `NOTIFIERS_GMAIL_USER`      | Email address to send notifications from.   |
 | `NOTIFIERS_GMAIL_PASSWORD`  | App password for the sending email address. |
 | `NOTIFIERS_GMAIL_RECIPIENT` | Email address(es) to receive notifications. |
@@ -95,7 +159,7 @@ the [notifications documentation](docs/notifications.md).
 These settings control the application's technical behavior.
 
 | env                   | description                                          |
-|-----------------------|------------------------------------------------------|
+| --------------------- | ---------------------------------------------------- |
 | `SESSION_SECRETS_DIR` | Directory to store session secrets for faster login. |
 | `LOGGING_CONFIG_PATH` | Path to the `.toml` file with logging configuration. |
 
@@ -123,7 +187,6 @@ Technical:
 
 Features:
 
-- book spot: add 'spot' as a command line parameter (now it reads the spot from user preferences/config/env)
 - in-app scheduler? (right now it is a simple atomic action logic. scheduling is done externally -- cron, etc.),
   there is no logic involved so retrying and similar stuff are not easy to achieve)
 

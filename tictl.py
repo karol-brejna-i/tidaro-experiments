@@ -70,19 +70,17 @@ def cli(ctx):
     help='Date of the reservation in YYYY-MM-DD format.'
 )
 @click.option(
-    '-s', '--spots',
-    default=None,
+    '-s', '--spot',
+    multiple=True,
     show_default=True,
-    help='Name of the spots to book.'
+    help='Name of the spot (may be many values) to book (or "*" for "book any").'
 )
 @click.pass_context
-def book_spot(ctx, date, spots):
+def book_spot(ctx, date, spot):
     """Book a parking spot."""
     logging.info('run_book_spot')
     config = ctx.obj['config']
-    if spots is None:
-        spots = config["book-spot"]["spots"]
-
+    spots = config["book-spot"]["spots"] if not spot else list(spot)
     session = get_logged_session(config)
 
     payload = {
@@ -140,7 +138,7 @@ def show_bookings(ctx):
     print_result(result)
 
 
-@cli.command(help="Automatically book free spots within your configured parameters.")
+@cli.command(short_help="Automatically book free spots within your configured parameters.")
 @click.pass_context
 def book_free(ctx):
     """Book free spots."""
