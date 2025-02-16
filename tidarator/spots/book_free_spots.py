@@ -15,7 +15,7 @@ class BookFreeSpots(ParkanizerActionBase):
         """
         Initialize the class with the session_spot object.
         :param session: Session object for accessing the Parkanizer service.
-        :param payload: dict with keys: for_date (YYYY-mm-dd), zone_name, spot_name
+        :param payload: dict with keys: zone_name, spot_name, start_from
         """
         super().__init__(session, payload)
         self.zone_manager = ZoneCacheManager(session)
@@ -45,7 +45,7 @@ class BookFreeSpots(ParkanizerActionBase):
         bookings = gb_result['result']['bookings']
 
         # filter out weekends, my current bookings and dates with no free spots
-        look_from = datetime.today() + timedelta(days=self.payload["look-ahead"])
+        look_from = utils.str_to_date(self.payload['start_from'])
         bookings = [
             booking for booking in bookings
             if utils.str_to_date(booking['day']) >= look_from
@@ -62,7 +62,7 @@ class BookFreeSpots(ParkanizerActionBase):
         from tidarator.spots.book_spot import BookSpot
         book_action = BookSpot(self.session, payload)
 
-        result: dict[str, dict | list] = {'action': 'book_free', 'request': {**self.payload, 'look-from': look_from}}
+        result: dict[str, dict | list] = {'action': 'book_free', 'request': {**self.payload, 'look_from': look_from}}
         attempts = []
         for booking in bookings:
             payload['for_date'] = booking['day']

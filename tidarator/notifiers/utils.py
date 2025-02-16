@@ -30,7 +30,7 @@ def format_results(data):
                 body += f"{s['name'].ljust(8)} | {state.rjust(8)} |\n"
 
         case 'book_free':
-            body += f"I was looking for free spots from {data['request']['look-from']} and tried to book spots {data['request']['spot_name']}.\n\n"
+            body += f"I was looking for free spots from {data['request']['look_from']} and tried to book spots {data['request']['spot_name']}.\n\n"
             attempts = data['result']
             if attempts:
                 body += "Bookings:\n"
