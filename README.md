@@ -127,20 +127,27 @@ for connecting to the Tidaro service and make bookings according to user's prefe
 | `TIDARO_PASSWORD` | Password for tidaro.com account.                               |
 | `SPOT_ZONE`       | The name of the parking spot area in the Tidaro service.       |
 | `SPOT_NAMES`      | Comma-separated list of preferred spot names ('*' == book any) |
-| `LOOK_AHEAD`      | Number of days to look ahead (default: 7).                     |
+| `LOOK_AHEAD`      | Default number of days to look ahead (optional, default: 0).    |
 
 `SPOT_ZONE` is the value you can observe in tidaro.com service (https://share.parkanizer.com/marketplace, "Choose
-parking spot area" dropdown box).
+parking spot area" dropdown box). It is a required parameter.
 
 `SPOT_NAMES` is a comma separated list of spot names (as you would see them when booking a spot).
 The order of the spots here is significant. It reflects the preferences of the user. The logic is:
 try the first spot, if it's not available, try the next one, etc.
+It is a required parameter.
 
 Here are some example values with explanation:
 
 - '*' -- book any free spot
 - '25,08' -- try 25, then 08 and give up when they are not free
 - '25,08,*' -- try 25, then 08 or book any if those are not available
+
+`LOOK_AHEAD` is the default value for `--look-ahead` parameter of the `book-free` action. 
+This action attempts to book free spots starting from today plus the number of days specified by `LOOK_AHEAD`. 
+For example, if `LOOK_AHEAD` is set to 7, the app will begin booking spots starting one week from today.
+
+### Notifications Configuration
 
 Environment variables that names start with `NOTIFIERS_` are responsible for
 configuring notifications. Currently only Gmail notifier is implemented.
@@ -153,6 +160,8 @@ configuring notifications. Currently only Gmail notifier is implemented.
 
 For detailed instructions on setting up Gmail notifications, see
 the [notifications documentation](docs/notifications.md).
+
+If notification settings are not given, no notifications are configured.
 
 ### Technical Settings
 
@@ -183,6 +192,8 @@ container.
 
 Technical:
 
+- either remove default value for spot names (book-spot, book-free), or set the env to '*'
+- add parking zone as a parameter
 - bookings should not be cached
 
 Features:
