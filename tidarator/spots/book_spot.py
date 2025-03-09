@@ -47,7 +47,7 @@ class BookSpot(ParkanizerActionBase):
                 spot = self.spot_manager.get_by_name(zone_id, preference)
                 result.append(spot.get("id"))
 
-        return result if result else None
+        return result
 
     def do_for_payload(self, p: dict[str, str | list[str]]) -> dict:
         logger.info(f'Booking a spot for the payload: {p}')
