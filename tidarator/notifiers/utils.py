@@ -37,7 +37,8 @@ def format_results(data):
                 for a in attempts:
                     r = a['result']
                     booked = r['spot'] if r['status'] == 'success' else "FAILED"
-                    body += f"{r['for_date'].ljust(8)} | {booked.rjust(8)} |\n"
+                    for_date = a['request']['for_date']
+                    body += f"{for_date.ljust(8)} | {booked.rjust(8)} |\n"
             else:
                 body += "No free spots found."
             body += "\n\n"
