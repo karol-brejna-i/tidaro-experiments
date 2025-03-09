@@ -27,7 +27,7 @@ ENV SESSION_SECRETS_DIR=/app/secret
 COPY --from=builder /app/dist/*.whl /dist/
 
 # Install the app
-RUN pip install --no-cache-dir /dist/tidarator-0.1.1-py3-none-any.whl
+RUN pip install --no-cache-dir /dist/tidarator-0.1.2-py3-none-any.whl
 
 # Default entrypoint for the container (from [project.scripts])
 ENTRYPOINT ["tidarator"]
