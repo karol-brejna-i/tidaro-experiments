@@ -8,7 +8,7 @@ format = '%(asctime)s - %(name)s - %(levelname)s - %(module)s.%(funcName)s:%(lin
 class = "logging.StreamHandler"
 formatter = "brief"
 stream = "ext://sys.stdout"
-level = "DEBUG"
+level = "INFO"
 
 [handlers.file]
 class = "logging.FileHandler"
@@ -19,5 +19,5 @@ encoding='utf-8'
 level = "DEBUG"
 
 [root]
-level = "INFO"
+level = "DEBUG"
 handlers = ["console", "file"]
