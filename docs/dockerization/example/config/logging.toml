@@ -19,5 +19,5 @@ encoding='utf-8'
 level = "DEBUG"
 
 [root]
-level = "INFO"
+level = "DEBUG"
 handlers = ["console", "file"]

@@ -4,6 +4,8 @@ from ..actions.action_base import ParkanizerActionBase
 from ..api.utils import str_to_date
 from ..log_config import get_logger
 
+import json
+
 logger = get_logger(__name__)
 
 
@@ -47,7 +49,7 @@ class BookSpot(ParkanizerActionBase):
                 spot = self.spot_manager.get_by_name(zone_id, preference)
                 result.append(spot.get("id"))
 
-        return result if result else None
+        return result
 
     def do_for_payload(self, p: dict[str, str | list[str]]) -> dict:
         logger.info(f'Booking a spot for the payload: {p}')
@@ -61,8 +63,9 @@ class BookSpot(ParkanizerActionBase):
             spots = [spots]
 
         spots_states = self.spot_manager.get_spots_state(zone_id, str_to_date(p['for_date']))
-        spot_ids = self._expand_spot_selection(zone_id, spots, spots_states)
+        logger.debug(f'Spot states: {json.dumps(spots_states)}')
 
+        spot_ids = self._expand_spot_selection(zone_id, spots, spots_states)
         logger.debug(f'Zone ID: {zone_id}; Spot IDs: {spot_ids}')
 
         result: dict[str, dict] = {'action': 'book_spot', 'request': p}

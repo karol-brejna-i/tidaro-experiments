@@ -63,7 +63,7 @@ def load_config():
             "zone": get_env_or_crash("SPOT_ZONE"),
             "spots": spots
         },
-        'check-spots': {'look-ahead': int(os.getenv("LOOK_AHEAD", 7))},
+        'check-spots': {'look-ahead': int(os.getenv("LOOK_AHEAD", 0))},
         'notifiers': notifiers
     }
 

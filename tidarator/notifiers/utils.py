@@ -30,14 +30,15 @@ def format_results(data):
                 body += f"{s['name'].ljust(8)} | {state.rjust(8)} |\n"
 
         case 'book_free':
-            body += f"I was looking for free spots from {data['request']['look-from']} and tried to book spots {data['request']['spot_name']}.\n\n"
+            body += f"I was looking for free spots from {data['request']['look_from']} and tried to book spots {data['request']['spot_name']}.\n\n"
             attempts = data['result']
             if attempts:
                 body += "Bookings:\n"
                 for a in attempts:
                     r = a['result']
                     booked = r['spot'] if r['status'] == 'success' else "FAILED"
-                    body += f"{r['for_date'].ljust(8)} | {booked.rjust(8)} |\n"
+                    for_date = a['request']['for_date']
+                    body += f"{for_date.ljust(8)} | {booked.rjust(8)} |\n"
             else:
                 body += "No free spots found."
             body += "\n\n"
