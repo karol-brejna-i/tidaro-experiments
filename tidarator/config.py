@@ -26,7 +26,7 @@ def get_path_or_default(env_name, default=None):
 # for quicker logging process, after successful login the secrets are stored in a file to be reused next time
 # in current implementation the file resides in the same folder as the main package (tidarator)
 SESSION_SECRETS_DIR = get_path_or_default("SESSION_SECRETS_DIR", pathlib.Path(__file__).parents[0].resolve())
-LOGGING_CONFIG_PATH = get_path_or_default("LOGGING_CONFIG_PATH", "logging.toml")
+LOGGING_CONFIG_PATH = get_path_or_default("LOGGING_CONFIG_PATH", pathlib.Path(__file__).parent / "logging.toml")
 LOG_DIR = get_path_or_default("LOG_DIR", pathlib.Path(__file__).parents[1].resolve())
 
 

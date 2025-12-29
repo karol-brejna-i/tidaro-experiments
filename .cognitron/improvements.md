@@ -801,7 +801,47 @@ if isinstance(look_from, datetime):
 
 ---
 
-### 27. Logging and CLI Output Are Interleaved on stdout
+### 27. ✅ Logging and CLI Output Are Interleaved on stdout [COMPLETED]
+
+**Status:** Implemented on 2025-12-29
+
+**Implementation Details:**
+- Modified [tidarator/logging.toml](../tidarator/logging.toml):
+  - Changed console handler stream from `ext://sys.stdout` to `ext://sys.stderr`
+  - Changed default console log level from `INFO` to `WARNING`
+- Modified [tidarator/log_config.py](../tidarator/log_config.py):
+  - Added `LOG_LEVEL` environment variable support for console handler (previously only affected root logger)
+  - Changed all `print()` statements to use `file=sys.stderr`
+  - Changed `get_logger()` to call `setup_logging()` with `quiet=False` to show configuration messages
+- Modified [tidarator/config.py](../tidarator/config.py):
+  - Fixed `LOGGING_CONFIG_PATH` default to use package-relative path instead of CWD-relative
+- Modified [tictl.py](../tictl.py):
+  - Added debug/info log messages in CLI initialization to demonstrate logging behavior
+- All 87 tests continue to pass
+
+**Testing Procedure:**
+```bash
+# 1. Default: only WARNING+ messages appear on stderr
+hatch run python tictl.py
+
+# 2. With LOG_LEVEL=INFO: INFO+ messages appear on stderr
+LOG_LEVEL=INFO hatch run python tictl.py
+
+# 3. Clean stdout (no log noise) when stderr redirected
+LOG_LEVEL=INFO hatch run python tictl.py 2>/dev/null
+
+# 4. Logs go to stderr
+LOG_LEVEL=INFO hatch run python tictl.py >/dev/null
+
+# 5. Check log file (created in CWD when commands run)
+cat application.log | tail -20
+```
+
+**Result:** ✅ Logs now go to stderr, CLI output to stdout, enabling clean piping: `tictl.py show-bookings | grep 2025-01`
+
+---
+
+**Original Analysis:**
 
 **Current State:**
 ```toml
@@ -1085,7 +1125,27 @@ for i, booking in enumerate(bookings, 1):
 
 ---
 
-### 33. Success/Failure Not Reflected in Exit Codes
+### 33. ✅ Success/Failure Not Reflected in Exit Codes [COMPLETED]
+
+**Status:** Implemented on 2024-12-29
+
+**Implementation Details:**
+- Added `get_exit_code()` helper function in [tictl.py](../tictl.py) that:
+  - Returns exit code 0 for successful operations
+  - Returns exit code 1 for failures/errors
+  - Handles list results (e.g., `book_free` which returns multiple booking attempts)
+  - Considers empty list as success (no spots to book is not a failure)
+- Added `ctx.exit(get_exit_code(result))` to all 5 CLI commands:
+  - `book_spot`, `release_spot`, `show_bookings`, `book_free`, `show_spots`
+- Added 8 unit tests in `TestGetExitCode` class to verify behavior
+
+**Test Coverage:**
+- Tests verify: success returns 0, failure/error returns 1, missing status returns 1
+- Tests verify list handling: at least one success → 0, all failures → 1, empty list → 0
+
+---
+
+**Original Analysis:**
 
 **Current State:**
 Commands always exit with code 0 (success), even when operations fail:
@@ -1184,13 +1244,13 @@ def booking():
 
 | Priority | Improvement | Impact | Effort |
 |----------|-------------|--------|--------|
-| High | Add tests (#11) | High | Medium |
+| ✅ | ~~Add tests (#11)~~ | High | Medium |
 | High | Fix security: pickle → JSON (#10) | High | Low |
 | High | Add CI/CD (#20) | High | Low |
 | High | Pin dependencies (#25) | High | Low |
 | High | Improve report format (#26) | High | Medium |
-| High | Separate logging to stderr (#27) | High | Low |
-| High | Exit codes for failures (#33) | High | Low |
+| ✅ | ~~Separate logging to stderr (#27)~~ | High | Low |
+| ✅ | ~~Exit codes for failures (#33)~~ | High | Low |
 | Medium | Add --version (#1) | Medium | Low |
 | Medium | Add --dry-run (#6) | Medium | Medium |
 | Medium | Fix logging consistency (#13, #29) | Medium | Low |

@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 from click.testing import CliRunner
 
-from tictl import cli
+from tictl import cli, get_exit_code
 
 
 @pytest.fixture
@@ -222,3 +222,53 @@ class TestDateValidation:
             result = cli_runner.invoke(cli, ["book-spot", "--date", "2025-06-15"])
             
             assert result.exit_code == 0
+
+
+class TestGetExitCode:
+    """Tests for get_exit_code helper function."""
+
+    def test_returns_zero_for_success(self):
+        result = {"action": "book_spot", "result": {"status": "success"}}
+        assert get_exit_code(result) == 0
+
+    def test_returns_one_for_failure(self):
+        result = {"action": "book_spot", "result": {"status": "failure"}}
+        assert get_exit_code(result) == 1
+
+    def test_returns_one_for_error(self):
+        result = {"action": "book_spot", "result": {"status": "error"}}
+        assert get_exit_code(result) == 1
+
+    def test_returns_one_for_missing_status(self):
+        result = {"action": "book_spot", "result": {}}
+        assert get_exit_code(result) == 1
+
+    def test_returns_one_for_missing_result(self):
+        result = {"action": "book_spot"}
+        assert get_exit_code(result) == 1
+
+    def test_handles_list_with_success(self):
+        """book_free returns a list of booking attempts."""
+        result = {
+            "action": "book_free",
+            "result": [
+                {"result": {"status": "failure"}},
+                {"result": {"status": "success"}},
+            ]
+        }
+        assert get_exit_code(result) == 0
+
+    def test_handles_list_all_failures(self):
+        result = {
+            "action": "book_free",
+            "result": [
+                {"result": {"status": "failure"}},
+                {"result": {"status": "failure"}},
+            ]
+        }
+        assert get_exit_code(result) == 1
+
+    def test_handles_empty_list(self):
+        """Empty list means no spots to book - not a failure."""
+        result = {"action": "book_free", "result": []}
+        assert get_exit_code(result) == 0

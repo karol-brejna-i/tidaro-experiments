@@ -1,6 +1,7 @@
 import logging
 import logging.config
 import os
+import sys
 import tomllib
 
 from tidarator.config import LOGGING_CONFIG_PATH
@@ -11,7 +12,7 @@ _logging_setup = False
 def get_logger(name):
     global _logging_setup
     if not _logging_setup:
-        setup_logging(LOGGING_CONFIG_PATH)
+        setup_logging(LOGGING_CONFIG_PATH, quiet=False)
         _logging_setup = True
 
     logger = logging.getLogger(name)
@@ -29,7 +30,7 @@ def setup_logging(config_path, quiet=True):
             if section_name in valid_sections:
                 logging_config[section_name] = section_data
             else:
-                print(f"WARNING! Unknown section in TOML config: {section_name}")
+                print(f"WARNING! Unknown section in TOML config: {section_name}", file=sys.stderr)
 
         # Environment variable override for log level
         log_level_env = os.environ.get("LOG_LEVEL")  # Get from environment
@@ -42,17 +43,21 @@ def setup_logging(config_path, quiet=True):
                     logging_config['root'] = {'level': log_level,
                                               'handlers': logging_config.get('root', {}).get('handlers', [])}
 
-                print(f"Log level overridden by environment variable: {log_level_env}")
+                # Also set console handler level to respect LOG_LEVEL
+                if 'handlers' in logging_config and 'console' in logging_config['handlers']:
+                    logging_config['handlers']['console']['level'] = log_level
+
+                print(f"Log level overridden by environment variable: {log_level_env}", file=sys.stderr)
             except AttributeError:
-                print(f"WARNING! Invalid LOG_LEVEL environment variable: {log_level_env}")
+                print(f"WARNING! Invalid LOG_LEVEL environment variable: {log_level_env}", file=sys.stderr)
 
         logging.config.dictConfig(logging_config)
 
 
     except FileNotFoundError:
         if not quiet:
-            print(f"Logging config file not found: {config_path}. Using basic config.")
+            print(f"Logging config file not found: {config_path}. Using basic config.", file=sys.stderr)
         logging.basicConfig(level=logging.WARNING)
     except Exception as e:
-        print(f"Error loading logging configuration: {e}. Using basic config.")
+        print(f"Error loading logging configuration: {e}. Using basic config.", file=sys.stderr)
         logging.basicConfig(level=logging.INFO)

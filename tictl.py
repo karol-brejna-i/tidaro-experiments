@@ -40,6 +40,25 @@ def print_result(data):
     click.echo(text)
 
 
+def get_exit_code(result):
+    """Return exit code based on result status. 0 for success, 1 for failure/error."""
+    inner_result = result.get('result', {})
+    
+    # Handle list results (e.g., book_free returns a list of booking attempts)
+    if isinstance(inner_result, list):
+        # Success if at least one item succeeded, or if list is empty (no spots to book)
+        if not inner_result:
+            return 0
+        return 0 if any(
+            item.get('result', {}).get('status') == 'success' 
+            for item in inner_result
+        ) else 1
+    
+    # Handle dict results with status field
+    status = inner_result.get('status', 'failure')
+    return 0 if status == 'success' else 1
+
+
 def configure_notifiers_for_action(action, config):
     gmail_config = config.get("notifiers", {}).get("gmail")
     if gmail_config:
@@ -56,9 +75,11 @@ def configure_notifiers_for_action(action, config):
 @click.pass_context
 def cli(ctx):
     """Tidarator: A command-line tool for managing parking spot bookings on tidaro.com."""
+    logger.debug("CLI initialized")
     ctx.ensure_object(dict)
     try:
         ctx.obj["config"] = load_config()
+        logger.info(f"Configuration loaded successfully")
     except MissingEnvironmentVariableError as e:
         logger.error(e)
         click.echo(f"Error: {e}!", file=sys.stderr)
@@ -101,6 +122,7 @@ def book_spot(ctx, date, spot):
     result = action.do()
 
     print_result(result)
+    ctx.exit(get_exit_code(result))
 
 
 @cli.command(help="Release a previously reserved parking spot.")
@@ -126,6 +148,7 @@ def release_spot(ctx, date):
     result = action.do()
 
     print_result(result)
+    ctx.exit(get_exit_code(result))
 
 
 @cli.command(help="Show all current bookings for your account.")
@@ -144,6 +167,7 @@ def show_bookings(ctx):
     result = action.do()
 
     print_result(result)
+    ctx.exit(get_exit_code(result))
 
 
 def compute_start_from(ctx):
@@ -206,6 +230,7 @@ def book_free(ctx, start_from, look_ahead):
     result = action.do()
 
     print_result(result)
+    ctx.exit(get_exit_code(result))
 
 
 @cli.command(help="Show spots status for a specific date.")
@@ -236,6 +261,7 @@ def show_spots(ctx, date):
     result = action.do()
 
     print_result(result)
+    ctx.exit(get_exit_code(result))
 
 
 if __name__ == "__main__":

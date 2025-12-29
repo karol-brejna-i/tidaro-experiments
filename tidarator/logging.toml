@@ -7,8 +7,8 @@ format = '%(asctime)s - %(name)s - %(levelname)s - %(module)s.%(funcName)s:%(lin
 [handlers.console]
 class = "logging.StreamHandler"
 formatter = "brief"
-stream = "ext://sys.stdout"
-level = "INFO"
+stream = "ext://sys.stderr"
+level = "WARNING"
 
 [handlers.file]
 class = "logging.FileHandler"
