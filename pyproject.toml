@@ -10,6 +10,13 @@ authors = [{ name = "Gallus Anonymus", email = "Gallus.Anonymus@example.com" }]
 dependencies = ["click", "python-dotenv", "requests", "yagmail"]
 requires-python = ">=3.12"
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "responses>=0.23",
+]
+
 [project.scripts]
 tidarator = "tictl:cli"
 
@@ -24,3 +31,20 @@ exclude = ["**/__pycache__/**", "config.toml", "**/session_secrets", "**/*.log"]
 
 [tool.hatch.envs.default]
 python = "3.12"
+
+[tool.hatch.envs.test]
+dependencies = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "responses>=0.23",
+]
+
+[tool.hatch.envs.test.scripts]
+run = "pytest {args}"
+cov = "pytest --cov=tidarator --cov=tictl --cov-report=term-missing {args}"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

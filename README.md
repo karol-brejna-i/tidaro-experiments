@@ -188,6 +188,37 @@ If logging config is not provided, defaults are used.
 You can also take a look at [the docs](docs/dockerization/build_and_run.md) to see how to run the app as a docker
 container.
 
+## Development
+
+### Running Tests
+
+The project uses pytest for testing. Tests are managed via Hatch:
+
+```bash
+# Run all tests
+hatch run test:run
+
+# Run tests with coverage report
+hatch run test:cov
+
+# Run specific test file
+hatch run test:run tests/test_config.py
+
+# Run with verbose output
+hatch run test:run -vv
+```
+
+Test coverage includes:
+- Configuration parsing and validation
+- Date utility functions
+- CLI command structure and options
+- Zone and spot cache managers
+- Result formatting for notifications
+
+### Installing Dev Dependencies
+
+Dev dependencies (pytest, pytest-cov, responses) are automatically installed when using the test environment.
+
 ## TODO
 
 Technical:

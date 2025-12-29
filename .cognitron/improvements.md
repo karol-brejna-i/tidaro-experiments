@@ -253,26 +253,22 @@ Session tokens are stored using `pickle.dump()` in a plain file.
 
 ---
 
-### 11. No Test Suite
+### 11. ~~No Test Suite~~ ✅ COMPLETED
 
-**Current State:**
-The `tests/` directory is empty.
+**Status:** Implemented on 2025-12-29
 
-**Why It's Not Great:**
-- No automated verification of functionality
-- Refactoring is risky
-- Regression bugs go undetected
+**What Was Done:**
+- Created test infrastructure with pytest and shared fixtures (`tests/conftest.py`)
+- Added 79 tests covering:
+  - Config module (18 tests) - 100% coverage
+  - API date utilities (12 tests) - 100% coverage
+  - Notifier formatting (10 tests) - 100% coverage
+  - Zone/Spot managers (17 tests) - 100% coverage
+  - CLI commands (17 tests) - 94% coverage
+- Configured Hatch test environment with `hatch run test:run` and `hatch run test:cov`
+- Overall project coverage: 51%
 
-**What Should Be Changed:**
-- Add unit tests for core logic (spot selection, date handling, config parsing)
-- Add integration tests with mocked API responses
-- Set up pytest with fixtures
-- Consider adding test coverage requirements
-
-**Benefits:**
-- Confidence in code changes
-- Documentation through tests
-- Easier onboarding for contributors
+**Run tests with:** `hatch run test:run`
 
 ---
 
