@@ -9,3 +9,4 @@ session_secrets
 *.priv
 .env
 .cognitron/prompts
+tidarator/_version.py

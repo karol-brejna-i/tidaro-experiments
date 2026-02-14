@@ -6,15 +6,50 @@ Tidarator uses [Hatch](https://hatch.pypa.io/) as its build system, defined in `
 
 ## Version Management
 
-The version is defined in a single place:
+The version is derived automatically from **git tags** using [`hatch-vcs`](https://github.com/ofek/hatch-vcs) (which wraps `setuptools-scm`).
 
+**How it works:**
+
+1. You create a git tag like `v0.3.0`
+2. `hatch-vcs` reads the tag and generates the version string
+3. During build, a `tidarator/_version.py` file is generated with the version
+4. At runtime, `tidarator.__version__` exposes the version (from `_version.py` or `importlib.metadata`)
+
+**Configuration** (in `pyproject.toml`):
 ```toml
-# pyproject.toml
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+
 [project]
-version = "0.1.2"
+dynamic = ["version"]
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0-dev"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "tidarator/_version.py"
 ```
 
-**To bump the version**, edit the `version` field in `pyproject.toml`. There are no other files that need updating — the Dockerfile now uses a wildcard to install the wheel (see fix below).
+**Version tag format:** `v<MAJOR>.<MINOR>.<PATCH>` (e.g., `v0.3.0`, `v1.0.0`)
+
+**To release a new version:**
+```bash
+git tag v0.3.0
+git push origin v0.3.0
+hatch build
+```
+
+**Between tags**, the version includes a dev suffix based on commit distance from the last tag, e.g. `0.3.0.dev4+gabcdef0`.
+
+**Check the version at runtime:**
+```bash
+tidarator --version
+# or
+python -c "from tidarator import __version__; print(__version__)"
+```
+
+> **Note:** `tidarator/_version.py` is auto-generated and listed in `.gitignore`. Do not edit it manually.
 
 ## Building the Package Locally
 
@@ -101,16 +136,9 @@ RUN pip install --no-cache-dir /dist/*.whl
 
 This is safe because the builder stage produces exactly one wheel.
 
-### 2. Version drift between source, dist, and Docker
+### ~~2. Version drift between source, dist, and Docker~~ ✅ RESOLVED
 
-**Problem observed**: At the time of analysis:
-- `pyproject.toml` says version `0.1.2`
-- Local `dist/` contains stale `0.1.0` artifacts
-- Docker image is tagged `0.3.0`
-
-These are all out of sync, making it unclear what code is actually running.
-
-**Recommendation**: Clean `dist/` before building and always tag Docker images to match the source version (see suggestions below).
+**Resolved by:** `hatch-vcs` — the version is now always derived from git tags, so source, dist, and Docker image are guaranteed to be in sync as long as builds happen from tagged commits.
 
 ---
 
@@ -140,46 +168,16 @@ docker build -t "tidarator:${VERSION}" -t tidarator:latest .
 echo "Done. Image: tidarator:${VERSION}"
 ```
 
-### B. Use hatch-vcs or dynamic versioning
+### ~~B. Use hatch-vcs or dynamic versioning~~ ✅ IMPLEMENTED
 
-Instead of manually editing `pyproject.toml`, derive the version from git tags:
+The project now uses `hatch-vcs` for git-tag-based versioning. See "Version Management" above.
 
-```toml
-[project]
-dynamic = ["version"]
+### ~~C. Make the version accessible at runtime~~ ✅ IMPLEMENTED
 
-[tool.hatch.version]
-source = "vcs"
+`tidarator/__init__.py` exposes `__version__` and the CLI has a `--version` flag.
 
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-```
-
-Then simply `git tag v0.2.0 && hatch build` — version is derived automatically.
-
-### C. Make the version accessible at runtime
-
-Add the version to `tidarator/__init__.py` for runtime inspection:
-
-```python
-# tidarator/__init__.py
-from importlib.metadata import version
-__version__ = version("tidarator")
-```
-
-Then add a `--version` flag to the CLI:
-
-```python
-@click.group()
-@click.version_option(package_name="tidarator")
-def cli(ctx):
-    ...
-```
-
-This lets users verify what version is running inside Docker:
 ```bash
-docker run tidarator:latest --version
+tidarator --version
 ```
 
 ### D. Add `.dockerignore`

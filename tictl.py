@@ -8,6 +8,7 @@ import click
 from click.core import ParameterSource
 from dotenv import load_dotenv
 
+from tidarator import __version__
 from tidarator.api import utils
 from tidarator.api.session_spot import ParkanizerSpotSession
 from tidarator.config import load_config, MissingEnvironmentVariableError
@@ -72,6 +73,7 @@ def configure_notifiers_for_action(action, config):
 
 
 @click.group()
+@click.version_option(version=__version__, prog_name="tidarator")
 @click.pass_context
 def cli(ctx):
     """Tidarator: A command-line tool for managing parking spot bookings on tidaro.com."""

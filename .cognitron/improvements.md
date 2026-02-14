@@ -15,28 +15,28 @@ This document outlines recommendations for improving usability, functionality, c
 
 ## Usability Improvements
 
-### 1. Missing `--version` CLI Option
+### 1. ✅ Missing `--version` CLI Option [COMPLETED]
 
-**Current State:**
-The CLI does not provide a `--version` flag to display the current application version.
+**Status:** Implemented on 2025-02-14
 
-**Why It's Not Great:**
-Users cannot quickly check which version of the tool they are running, making debugging and support harder.
+**What Was Done:**
+- Switched to `hatch-vcs` for git-tag-based versioning (version derived from git tags)
+- Added `tidarator/_version.py` auto-generation via `hatch-vcs` build hook
+- Exposed `__version__` in `tidarator/__init__.py` with fallback chain (`_version.py` → `importlib.metadata` → `0.0.0-dev`)
+- Added `@click.version_option` to the CLI group
+- Updated Dockerfile to include `git` and `hatch-vcs` in builder stage
+- Removed `.git` from `.dockerignore` so version can be derived during Docker builds
+- Added CLI test for `--version` flag
+- Updated `docs/build-system.md`
 
-**What Should Be Changed:**
-Add a `--version` option to the main CLI group using Click's built-in functionality:
-```python
-@click.group()
-@click.version_option(version="0.1.2", prog_name="tidarator")
-@click.pass_context
-def cli(ctx):
-    ...
+**Usage:**
+```bash
+tidarator --version
+# tidarator, version 0.3.0
+
+# Release a new version:
+git tag v0.3.0 && git push origin v0.3.0
 ```
-
-**Benefits:**
-- Standard CLI behavior users expect
-- Easier troubleshooting and version tracking
-- Version can be pulled dynamically from `importlib.metadata`
 
 ---
 
@@ -533,34 +533,19 @@ jobs:
 
 ---
 
-### 21. Version Not Derived from Single Source
+### 21. ✅ Version Not Derived from Single Source [COMPLETED]
 
-**Current State:**
-Version `0.1.2` appears in multiple places:
-- `pyproject.toml`
-- `Dockerfile`
-- (potentially more)
+**Status:** Implemented on 2025-02-14
 
-**Why It's Not Great:**
-- Easy to get out of sync
-- Manual updates required in multiple places
+**What Was Done:**
+- Replaced static `version = "0.2.0"` in `pyproject.toml` with `dynamic = ["version"]`
+- Configured `hatch-vcs` to derive version from git tags
+- Added `tidarator/_version.py` auto-generation (in `.gitignore`)
+- Runtime access via `tidarator.__version__` and `tidarator --version`
+- Dockerfile picks up version automatically
+- See `docs/build-system.md` for full details
 
-**What Should Be Changed:**
-Use `importlib.metadata` to get version at runtime:
-```python
-from importlib.metadata import version
-__version__ = version("tidarator")
-```
-
-And in CLI:
-```python
-@click.version_option(version=__version__)
-```
-
-**Benefits:**
-- Single source of truth
-- Automatic version sync
-- Standard Python practice
+**Release workflow:** `git tag v0.3.0 && git push origin v0.3.0 && hatch build`
 
 ---
 
@@ -1251,11 +1236,12 @@ def booking():
 | High | Improve report format (#26) | High | Medium |
 | ✅ | ~~Separate logging to stderr (#27)~~ | High | Low |
 | ✅ | ~~Exit codes for failures (#33)~~ | High | Low |
-| Medium | Add --version (#1) | Medium | Low |
+| ✅ | ~~Add --version (#1)~~ | Medium | Low |
 | Medium | Add --dry-run (#6) | Medium | Medium |
 | Medium | Fix logging consistency (#13, #29) | Medium | Low |
 | Medium | Add -q/-v flags (#28) | Medium | Low |
 | Medium | Remove dead code (#14) | Low | Low |
+| ✅ | ~~Single source version (#21)~~ | Medium | Low |
 | Medium | Add type hints (#17) | Medium | Medium |
 | Medium | Better help text (#34) | Medium | Low |
 | Low | Add output formats (#5) | Medium | Medium |

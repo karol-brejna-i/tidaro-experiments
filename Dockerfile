@@ -3,11 +3,14 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-RUN pip install --upgrade pip hatch
+# Install git (required by hatch-vcs to derive version from tags)
+RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip hatch hatch-vcs
 
 COPY . .
 
-RUN hatch build
+RUN rm -rf dist/ && hatch build
 
 
 # Stage 2: Runtime stage

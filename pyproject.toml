@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "tidarator"
-version = "0.2.0"
+dynamic = ["version"]
 description = "A Python CLI app for managing Tidaro.com parking spot bookings."
 authors = [{ name = "Gallus Anonymus", email = "Gallus.Anonymus@example.com" }]
 dependencies = ["click", "python-dotenv", "requests", "yagmail"]
@@ -19,6 +19,16 @@ dev = [
 
 [project.scripts]
 tidarator = "tictl:cli"
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0-dev"
+
+[tool.hatch.version.raw-options]
+version_scheme = "guess-next-dev"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "tidarator/_version.py"
 
 [tool.hatch.metadata]
 license = "Apache-2.0"

@@ -6,6 +6,6 @@ venv/
 dist/
 *.priv
 docs
-.git
+# .git is NOT excluded — hatch-vcs needs it to derive the version from git tags
 session_secrets
 *.log

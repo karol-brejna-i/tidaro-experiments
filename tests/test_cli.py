@@ -35,6 +35,12 @@ class TestCliGroup:
         assert "show-spots" in result.output
         assert "book-free" in result.output
 
+    def test_version_flag(self, cli_runner):
+        result = cli_runner.invoke(cli, ["--version"])
+        
+        assert result.exit_code == 0
+        assert "tidarator" in result.output
+
     def test_exits_on_missing_env(self, cli_runner, clean_env):
         result = cli_runner.invoke(cli, ["show-bookings"])
         
