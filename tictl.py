@@ -224,6 +224,7 @@ def book_free(ctx, start_from, look_ahead):
         "zone_name": config["book-spot"]["zone"],
         "spot_name": config["book-spot"]["spots"],
         "start_from": start_from,
+        "include_weekends": config["check-spots"].get("include-weekends", False),
     }
     action = BookFreeSpots(session, payload)
     configure_notifiers_for_action(action, config)

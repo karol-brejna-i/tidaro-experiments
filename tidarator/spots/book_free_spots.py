@@ -44,15 +44,20 @@ class BookFreeSpots(ParkanizerActionBase):
         gb_result = action.do()
         bookings = gb_result['result']['bookings']
 
-        # filter out weekends, my current bookings and dates with no free spots
+        # filter out my current bookings and dates with no free spots
+        # optionally filter out weekends (default: skip weekends)
         look_from = utils.str_to_date(self.payload['start_from'])
+        include_weekends = self.payload.get('include_weekends', False)
+        logger.info(f'Filtering bookings: look_from={look_from}, include_weekends={include_weekends}')
+
         bookings = [
             booking for booking in bookings
             if utils.str_to_date(booking['day']) >= look_from
                and not booking['my_booking']
-               and utils.str_to_date(booking['day']).weekday() < 5
+               and (include_weekends or utils.str_to_date(booking['day']).weekday() < 5)
                and booking['free_spots'] > 0
         ]
+        logger.info(f'Days to attempt booking: {[b["day"] for b in bookings]}')
 
         payload = {
             'zone_name': self.payload['zone_name'],

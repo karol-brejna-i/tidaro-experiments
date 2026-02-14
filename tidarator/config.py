@@ -53,6 +53,8 @@ def load_config():
 
     notifiers = parse_notifiers()
 
+    include_weekends = os.getenv("INCLUDE_WEEKENDS", "false").lower() in ("true", "1", "yes")
+
     config = {
         "tidaro": {
             "user": get_env_or_crash("TIDARO_USER"),
@@ -63,7 +65,10 @@ def load_config():
             "zone": get_env_or_crash("SPOT_ZONE"),
             "spots": spots
         },
-        'check-spots': {'look-ahead': int(os.getenv("LOOK_AHEAD", 0))},
+        'check-spots': {
+            'look-ahead': int(os.getenv("LOOK_AHEAD", 0)),
+            'include-weekends': include_weekends,
+        },
         'notifiers': notifiers
     }
 
