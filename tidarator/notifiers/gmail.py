@@ -37,6 +37,9 @@ class GmailNotifier(object):
 
         # if recipient is a string, make it a list
         for r in self.recipient:
-            result = self.yag.send(to=r, subject=subject, contents=body)
-            logger.debug(f'gmail notification sending to {r} status:{str(result)}')
+            try:
+                result = self.yag.send(to=r, subject=subject, contents=body)
+                logger.debug(f'gmail notification sending to {r} status:{str(result)}')
+            except Exception as e:
+                logger.error(f'Failed to send gmail notification to {r}: {e}')
 
